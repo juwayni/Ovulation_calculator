@@ -1,4 +1,4 @@
-import '../models/symptom_model.dart';
+import '../../data/models/symptom_model.dart';
 
 abstract class ISymptomRepository {
   Future<List<SymptomModel>> getSymptoms();
