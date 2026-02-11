@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/theme_extension.dart';
 import '../../widgets/circular_stat_widget.dart';
-import '../providers/analysis_provider.dart';
+import '../../providers/analysis_provider.dart';
 import '../../../domain/entities/cycle_entity.dart';
 
 class AnalysisScreen extends ConsumerStatefulWidget {
