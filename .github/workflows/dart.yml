@@ -1,33 +1,50 @@
 name: Flutter Build APK
+
 on:
   push:
+    branches: [ "feature/ovulation-calculator-v1-6860301650579759487" ]
+  pull_request:
     branches: [ "feature/ovulation-calculator-v1-6860301650579759487" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'gradle' # Speeds up future builds
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          cache: true # Speeds up future builds
 
       - name: Install dependencies
         run: flutter pub get
 
+      # Important: Generates the missing provider files before compiling
+      - name: Run Build Runner
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+
+      # This helps prevent the "No such file or directory" errors caused by Case Sensitivity
+      - name: Ensure lowercase paths (Linux fix)
+        run: |
+          find lib -name "*.dart" -exec sed -i 's/Providers\//providers\//g' {} +
+
       - name: Build APK
         run: flutter build apk --release
 
-      - name: Upload APK
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-apk
+          name: ovulation-calculator-release
           path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
