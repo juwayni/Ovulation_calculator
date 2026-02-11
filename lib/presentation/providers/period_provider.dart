@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/period_model.dart';
 import '../providers/repository_providers.dart';
+import '../../domain/repositories/period_repository.dart';
 
 final periodsProvider = FutureProvider<List<PeriodModel>>((ref) async {
   final repository = ref.watch(periodRepositoryProvider);
