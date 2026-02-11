@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/date_selector.dart';
-import '../providers/cycle_provider.dart';
-import '../providers/period_provider.dart';
+import '../../providers/cycle_provider.dart';
+import '../../providers/period_provider.dart';
 import '../../../data/models/period_model.dart';
 import 'package:uuid/uuid.dart';
 
