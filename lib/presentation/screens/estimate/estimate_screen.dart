@@ -4,7 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/theme_extension.dart';
 import '../../widgets/cycle_ring_painter.dart';
-import '../providers/cycle_provider.dart';
+import '../../providers/cycle_provider.dart';
 import '../../../domain/entities/cycle_entity.dart';
 
 class EstimateScreen extends ConsumerStatefulWidget {
