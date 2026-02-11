@@ -4,7 +4,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/theme_extension.dart';
-import '../../widgets/circular_stat_widget.dart';
 import '../../providers/analysis_provider.dart';
 import '../../../domain/entities/cycle_entity.dart';
 
@@ -30,10 +29,13 @@ class _AnalysisScreenState extends ConsumerState<AnalysisScreen> with SingleTick
     final analysisAsync = ref.watch(cycleAnalysisProvider);
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.chevron_left),
+          onPressed: () => Navigator.maybePop(context),
+        ),
         title: const Text('Analysis', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
         actions: [
@@ -64,24 +66,28 @@ class _AnalysisScreenState extends ConsumerState<AnalysisScreen> with SingleTick
 
   Widget _buildTabSwitcher() {
     return Container(
-      margin: const EdgeInsets.all(AppConstants.paddingMedium),
-      height: 45,
+      margin: const EdgeInsets.symmetric(horizontal: AppConstants.paddingMedium, vertical: 8),
+      height: 50,
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(25),
+        border: Border.all(color: Colors.grey.shade100),
       ),
       child: TabBar(
         controller: _tabController,
         indicator: BoxDecoration(
           borderRadius: BorderRadius.circular(25),
-          gradient: LinearGradient(
-            colors: [Theme.of(context).colorScheme.primary, const Color(0xFFFF8C94)],
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFF6B81), Color(0xFFFF8C94)],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
           ),
         ),
         labelColor: Colors.white,
         unselectedLabelColor: Colors.grey,
         indicatorSize: TabBarIndicatorSize.tab,
         dividerColor: Colors.transparent,
+        labelStyle: const TextStyle(fontWeight: FontWeight.bold),
         tabs: const [
           Tab(text: 'Cycle'),
           Tab(text: 'Period'),
@@ -99,7 +105,9 @@ class _AnalysisScreenState extends ConsumerState<AnalysisScreen> with SingleTick
       return const Center(child: Text('No data recorded yet.'));
     }
 
-    final dateRange = '${DateFormat('MMM d').format(current.startDate)} - ${DateFormat('MMM d').format(current.startDate.add(Duration(days: current.cycleLength)))}';
+    final startDateStr = DateFormat('MMM d').format(current.startDate);
+    final endDateStr = DateFormat('MMM d').format(current.startDate.add(Duration(days: current.cycleLength)));
+    final dateRange = '$startDateStr - $endDateStr';
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppConstants.paddingMedium),
@@ -107,60 +115,101 @@ class _AnalysisScreenState extends ConsumerState<AnalysisScreen> with SingleTick
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Center(
-            child: Text(
-              '$dateRange, ${current.cycleLength} days (predicted)',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            child: RichText(
+              text: TextSpan(
+                style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+                children: [
+                  TextSpan(text: '$dateRange, ${current.cycleLength} days '),
+                  const TextSpan(
+                    text: '(predicted)',
+                    style: TextStyle(color: Colors.grey, fontWeight: FontWeight.normal),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 24),
           _buildStatGrid(current, theme),
           const SizedBox(height: 32),
-          const Text('Cycle Comparison', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          const Text('Cycle', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
           const SizedBox(height: 16),
           _buildLegend(),
           const SizedBox(height: 16),
           _buildBarChart(current, last, theme),
+          const SizedBox(height: 32),
         ],
       ),
     );
   }
 
   Widget _buildStatGrid(CycleEntity cycle, CycleThemeExtension theme) {
+    // Calculating phases based on entity
+    final periodDays = cycle.periodLength;
+    final follicularDays = cycle.ovulationDay.difference(cycle.startDate).inDays - periodDays;
+    final fertileDays = cycle.fertileWindowEnd.difference(cycle.fertileWindowStart).inDays + 1;
+    final lutealDays = cycle.cycleLength - (periodDays + follicularDays);
+
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 2,
-      mainAxisSpacing: 20,
-      crossAxisSpacing: 20,
-      childAspectRatio: 0.85,
+      mainAxisSpacing: 16,
+      crossAxisSpacing: 16,
+      childAspectRatio: 0.9,
       children: [
-        _buildStatCard('Current', 'Period', cycle.periodLength.toDouble(), cycle.cycleLength.toDouble(), theme.period),
-        _buildStatCard('Current', 'Follicular Phase', 14, cycle.cycleLength.toDouble(), theme.follicular),
-        _buildStatCard('Current', 'Fertile Window', 7, cycle.cycleLength.toDouble(), theme.fertile),
-        _buildStatCard('Current', 'Luteal Phase', 14, cycle.cycleLength.toDouble(), theme.luteal),
+        _buildStatCard('Current Cycle', 'Period', periodDays, theme.period),
+        _buildStatCard('Current Cycle', 'Follicular Phase', follicularDays, theme.follicular),
+        _buildStatCard('Current Cycle', 'Fertile Window', fertileDays, theme.fertile),
+        _buildStatCard('Current Cycle', 'Luteal Phase', lutealDays, theme.luteal),
       ],
     );
   }
 
-  Widget _buildStatCard(String date, String label, double value, double max, Color color) {
+  Widget _buildStatCard(String dateRange, String label, int days, Color color) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade200),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.grey.shade100),
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularStatWidget(
-            value: value,
-            maxValue: max,
-            label: '${value.toInt()}',
-            subLabel: '',
-            color: color,
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox(
+                width: 60,
+                height: 60,
+                child: CircularProgressIndicator(
+                  value: days / 28,
+                  strokeWidth: 4,
+                  backgroundColor: Colors.grey.shade100,
+                  valueColor: AlwaysStoppedAnimation<Color>(color),
+                ),
+              ),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(text: '$days', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16)),
+                    const TextSpan(text: 'days', style: TextStyle(color: Colors.grey, fontSize: 10)),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(date, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 11), textAlign: TextAlign.center),
+          const SizedBox(height: 16),
+          Text(
+            dateRange,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+            textAlign: TextAlign.center,
+          ),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.grey, fontSize: 11),
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );
@@ -170,9 +219,9 @@ class _AnalysisScreenState extends ConsumerState<AnalysisScreen> with SingleTick
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        _buildLegendItem('Current', Theme.of(context).colorScheme.primary),
+        _buildLegendItem('Current', const Color(0xFFFF6B81)),
         const SizedBox(width: 16),
-        _buildLegendItem('Last', Theme.of(context).colorScheme.primary.withOpacity(0.3)),
+        _buildLegendItem('Last', const Color(0xFFFF6B81).withOpacity(0.3)),
       ],
     );
   }
@@ -188,29 +237,65 @@ class _AnalysisScreenState extends ConsumerState<AnalysisScreen> with SingleTick
   }
 
   Widget _buildBarChart(CycleEntity current, CycleEntity? last, CycleThemeExtension theme) {
+    final List<String> diffs = [];
+    if (last != null) {
+        diffs.add(_formatDiff(current.cycleLength - last.cycleLength));
+        diffs.add(_formatDiff(current.periodLength - last.periodLength));
+        // For others we can use default or calculated
+        diffs.addAll(['+0', '+0', '+0']);
+    } else {
+        diffs.addAll(['', '', '', '', '']);
+    }
+
     return SizedBox(
-      height: 200,
+      height: 250,
       child: BarChart(
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
           maxY: 35,
-          barTouchData: BarTouchData(enabled: false),
+          barTouchData: BarTouchData(
+            enabled: true,
+            touchTooltipData: BarTouchTooltipData(
+                getTooltipColor: (group) => Colors.transparent,
+                tooltipPadding: EdgeInsets.zero,
+                tooltipMargin: 0,
+                getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                  if (rodIndex != 0 || groupIndex >= diffs.length || diffs[groupIndex].isEmpty) return null;
+                  return BarTooltipItem(
+                    diffs[groupIndex],
+                    const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12),
+                  );
+                },
+            ),
+          ),
           titlesData: FlTitlesData(
             show: true,
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
                 getTitlesWidget: (value, meta) {
-                  const titles = ['Cycle', 'Period', 'Fertile', 'Follic.', 'Luteal'];
+                  const titles = ['Cycle\nLength', 'Period', 'Fertile\nWindow', 'Follicula\nr Phase', 'Luteal\nPhase'];
                   if (value.toInt() >= titles.length) return const SizedBox();
                   return Padding(
                     padding: const EdgeInsets.only(top: 8.0),
-                    child: Text(titles[value.toInt()], style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                    child: Text(
+                      titles[value.toInt()],
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 9, color: Colors.grey, fontWeight: FontWeight.bold),
+                    ),
                   );
                 },
+                reservedSize: 45,
               ),
             ),
-            leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: true, interval: 8, reservedSize: 28)),
+            leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                    showTitles: true,
+                    interval: 8,
+                    reservedSize: 28,
+                    getTitlesWidget: (value, meta) => Text('${value.toInt()}', style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                ),
+            ),
             topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           ),
@@ -218,9 +303,9 @@ class _AnalysisScreenState extends ConsumerState<AnalysisScreen> with SingleTick
           borderData: FlBorderData(show: false),
           barGroups: [
             _buildBarGroup(0, current.cycleLength.toDouble(), last?.cycleLength.toDouble() ?? 28, theme.period),
-            _buildBarGroup(1, current.periodLength.toDouble(), last?.periodLength.toDouble() ?? 5, theme.follicular),
+            _buildBarGroup(1, current.periodLength.toDouble(), last?.periodLength.toDouble() ?? 5, theme.period),
             _buildBarGroup(2, 7, 7, theme.fertile),
-            _buildBarGroup(3, 14, 14, theme.pms),
+            _buildBarGroup(3, 14, 14, theme.follicular),
             _buildBarGroup(4, 14, 14, theme.luteal),
           ],
         ),
@@ -228,13 +313,30 @@ class _AnalysisScreenState extends ConsumerState<AnalysisScreen> with SingleTick
     );
   }
 
+  String _formatDiff(int diff) {
+      if (diff > 0) return '+$diff';
+      if (diff < 0) return '$diff';
+      return '0';
+  }
+
   BarChartGroupData _buildBarGroup(int x, double val1, double val2, Color color) {
     return BarChartGroupData(
       x: x,
       barRods: [
-        BarChartRodData(toY: val1, color: color, width: 8, borderRadius: BorderRadius.circular(4)),
-        BarChartRodData(toY: val2, color: color.withOpacity(0.3), width: 8, borderRadius: BorderRadius.circular(4)),
+        BarChartRodData(
+          toY: val1,
+          color: color,
+          width: 12,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+        ),
+        BarChartRodData(
+          toY: val2,
+          color: color.withOpacity(0.2),
+          width: 12,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+        ),
       ],
+      showingTooltipIndicators: [0],
     );
   }
 }

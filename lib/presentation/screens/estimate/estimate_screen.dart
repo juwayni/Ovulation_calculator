@@ -21,12 +21,18 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
     final cycleAsync = ref.watch(currentCycleProvider);
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.chevron_left),
+          onPressed: () => Navigator.maybePop(context),
+        ),
         title: const Text('Estimate', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
+        actions: [
+          IconButton(onPressed: () {}, icon: const Icon(Icons.more_horiz)),
+        ],
       ),
       body: cycleAsync.when(
         data: (cycle) => _buildContent(cycle, cycleTheme),
@@ -37,194 +43,198 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
   }
 
   Widget _buildContent(CycleEntity cycle, CycleThemeExtension theme) {
-    // Calculate current day relative to cycle start (simplified)
     final now = DateTime.now();
-    int currentDayOfCycle = now.difference(cycle.startDate.subtract(Duration(days: cycle.cycleLength))).inDays + 1;
+    int currentDayOfCycle = now.difference(cycle.startDate).inDays + 1;
     currentDayOfCycle = currentDayOfCycle.clamp(1, cycle.cycleLength);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppConstants.paddingMedium),
       child: Column(
         children: [
-          _buildCycleCircle(cycle, currentDayOfCycle, theme),
-          const SizedBox(height: 30),
-          _buildPhaseDetails(cycle, theme),
-          const SizedBox(height: 30),
-          _buildTemperatureChart(theme),
+          _buildCycleRingWithLabels(cycle, currentDayOfCycle, theme),
+          const SizedBox(height: 40),
+          _buildTemperatureCurve(theme),
         ],
       ),
     );
   }
 
-  Widget _buildCycleCircle(CycleEntity cycle, int currentDay, CycleThemeExtension theme) {
-    // Define period days, fertile days, etc based on cycle entity
+  Widget _buildCycleRingWithLabels(CycleEntity cycle, int currentDay, CycleThemeExtension theme) {
     List<int> periodDays = List.generate(cycle.periodLength, (i) => i + 1);
+    int ovulationDayIndex = cycle.ovulationDay.difference(cycle.startDate).inDays + 1;
+    List<int> fertileDays = List.generate(6, (i) => ovulationDayIndex - 4 + i);
+    List<int> pmsDays = List.generate(3, (i) => cycle.cycleLength - i);
 
-    // Calculate fertile days indices
-    int ovulationDayIndex = cycle.ovulationDay.difference(cycle.startDate.subtract(Duration(days: cycle.cycleLength))).inDays + 1;
-    List<int> fertileDays = List.generate(7, (i) => ovulationDayIndex - 5 + i);
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Ring
+        SizedBox(
+          width: 300,
+          height: 300,
+          child: CustomPaint(
+            painter: CycleRingPainter(
+              totalDays: cycle.cycleLength,
+              currentDay: currentDay,
+              periodDays: periodDays,
+              fertileDays: fertileDays,
+              ovulationDay: ovulationDayIndex,
+              pmsDays: pmsDays,
+              periodColor: theme.period,
+              fertileColor: theme.fertile,
+              pmsColor: theme.pms,
+            ),
+          ),
+        ),
+        // Labels
+        Positioned(top: 20, left: 20, child: _buildRingLabel('PMS', theme.pms)),
+        Positioned(top: 20, right: 20, child: _buildRingLabel('Period', theme.period)),
+        Positioned(bottom: 50, right: 10, child: _buildRingLabel('Fertile', theme.fertile)),
 
-    return Center(
-      child: TweenAnimationBuilder<double>(
-        tween: Tween(begin: 0, end: currentDay.toDouble()),
-        duration: const Duration(milliseconds: 1500),
-        curve: Curves.easeOutCubic,
-        builder: (context, value, child) {
-          return Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox(
-                width: 280,
-                height: 280,
-                child: CustomPaint(
-                  painter: CycleRingPainter(
-                    totalDays: cycle.cycleLength,
-                    currentDay: value.toInt(),
-                    periodDays: periodDays,
-                    fertileDays: fertileDays,
-                    ovulationDay: ovulationDayIndex,
-                    pmsDays: [cycle.cycleLength, cycle.cycleLength - 1, cycle.cycleLength - 2],
-                    periodColor: theme.period,
-                    fertileColor: theme.fertile,
-                    pmsColor: theme.pms,
-                  ),
-                ),
-              ),
-              child!,
-            ],
-          );
-        },
-        child: Column(
+        // Center Content
+        Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'Day $currentDay',
-              style: const TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              currentDay == ovulationDayIndex ? 'Ovulation Day' : 'Follicular Phase',
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 16,
-              ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.favorite, color: theme.period.withOpacity(0.8), size: 24),
+                Transform.translate(
+                  offset: const Offset(-8, 0),
+                  child: Icon(Icons.favorite, color: theme.period.withOpacity(0.5), size: 24),
+                ),
+              ],
             ),
             const SizedBox(height: 8),
-            if (fertileDays.contains(currentDay))
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: theme.fertile.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  'High Chance',
-                  style: TextStyle(
-                    color: theme.ovulation,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
+            const Text(
+              'Estimated',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            ),
+            const Text(
+              'Ovulation',
+              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildPhaseDetails(CycleEntity cycle, CycleThemeExtension theme) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        _buildPhaseItem('Period', '${cycle.periodLength} days', theme.period),
-        _buildPhaseItem('Fertile', '7 days', theme.fertile),
-        _buildPhaseItem('PMS', '3 days', theme.pms),
       ],
     );
   }
 
-  Widget _buildPhaseItem(String label, String value, Color color) {
+  Widget _buildRingLabel(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color, width: 1),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12),
+      ),
+    );
+  }
+
+  Widget _buildTemperatureCurve(CycleThemeExtension theme) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
+        const Padding(
+          padding: EdgeInsets.only(left: 8.0),
+          child: Text(
+            'Temperature Curve',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
-        const SizedBox(height: 4),
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-        Text(value, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-      ],
-    );
-  }
-
-  Widget _buildTemperatureChart(CycleThemeExtension theme) {
-    return Container(
-      height: 250,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Body Temperature',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        const SizedBox(height: 20),
+        Container(
+          height: 200,
+          padding: const EdgeInsets.fromLTRB(10, 20, 20, 10),
+          decoration: BoxDecoration(
+            color: theme.period.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(24),
           ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: LineChart(
-              LineChartData(
-                gridData: const FlGridData(show: false),
-                titlesData: const FlTitlesData(show: false),
-                borderData: FlBorderData(show: false),
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: const [
-                      FlSpot(0, 36.5),
-                      FlSpot(1, 36.6),
-                      FlSpot(2, 36.4),
-                      FlSpot(3, 36.5),
-                      FlSpot(4, 36.7),
-                      FlSpot(5, 37.1),
-                      FlSpot(6, 37.0),
-                    ],
-                    isCurved: true,
-                    color: theme.temperatureLine,
-                    barWidth: 4,
-                    isStrokeCapRound: true,
-                    dotData: const FlDotData(show: true),
-                    belowBarData: BarAreaData(
-                      show: true,
-                      color: theme.temperatureArea,
-                    ),
+          child: LineChart(
+            LineChartData(
+              gridData: FlGridData(
+                show: true,
+                drawVerticalLine: false,
+                horizontalInterval: 1,
+                getDrawingHorizontalLine: (value) => FlLine(
+                  color: Colors.grey.withOpacity(0.2),
+                  strokeWidth: 1,
+                ),
+              ),
+              titlesData: FlTitlesData(
+                show: true,
+                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    interval: 1,
+                    getTitlesWidget: (value, meta) => Text('${value.toInt()}°F', style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                    reservedSize: 35,
                   ),
-                ],
-                lineTouchData: LineTouchData(
-                  touchTooltipData: LineTouchTooltipData(
-                    getTooltipColor: (touchedSpot) => Colors.white,
-                    getTooltipItems: (touchedSpots) {
-                      return touchedSpots.map((spot) {
-                        return LineTooltipItem(
-                          '${spot.y}°C',
-                          const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                        );
-                      }).toList();
+                ),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    interval: 1,
+                    getTitlesWidget: (value, meta) {
+                      if (value < 3 || value > 9) return const SizedBox();
+                      return Text('${value.toInt()}', style: const TextStyle(fontSize: 10, color: Colors.grey));
                     },
                   ),
                 ),
               ),
+              borderData: FlBorderData(show: false),
+              minX: 2.5,
+              maxX: 9.5,
+              minY: 94.5,
+              maxY: 99.5,
+              lineBarsData: [
+                LineChartBarData(
+                  spots: const [
+                    FlSpot(3, 96.0),
+                    FlSpot(4, 96.5),
+                    FlSpot(5, 95.8),
+                    FlSpot(6, 96.8),
+                    FlSpot(7, 98.2),
+                    FlSpot(8, 97.2),
+                    FlSpot(9, 95.5),
+                  ],
+                  isCurved: true,
+                  color: theme.period,
+                  barWidth: 2,
+                  isStrokeCapRound: true,
+                  dotData: FlDotData(
+                    show: true,
+                    getDotPainter: (spot, percent, barData, index) {
+                      if (spot.x == 5) {
+                        return FlDotCirclePainter(
+                          radius: 6,
+                          color: theme.period,
+                          strokeWidth: 0,
+                        );
+                      }
+                      return FlDotCirclePainter(radius: 0, color: Colors.transparent);
+                    },
+                  ),
+                  belowBarData: BarAreaData(
+                    show: true,
+                    gradient: LinearGradient(
+                      colors: [theme.period.withOpacity(0.3), theme.period.withOpacity(0.0)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
