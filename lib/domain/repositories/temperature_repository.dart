@@ -1,4 +1,4 @@
-import '../models/temperature_model.dart';
+import '../../data/models/temperature_model.dart';
 
 abstract class ITemperatureRepository {
   Future<List<TemperatureModel>> getTemperatures();
