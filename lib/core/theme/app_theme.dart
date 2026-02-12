@@ -35,12 +35,8 @@ class AppTheme {
           color: AppColors.textPrimary,
           fontWeight: FontWeight.bold,
         ),
-        bodyLarge: GoogleFonts.poppins(
-          color: AppColors.textPrimary,
-        ),
-        bodyMedium: GoogleFonts.poppins(
-          color: AppColors.textSecondary,
-        ),
+        bodyLarge: GoogleFonts.poppins(color: AppColors.textPrimary),
+        bodyMedium: GoogleFonts.poppins(color: AppColors.textSecondary),
       ),
       extensions: [
         CycleThemeExtension(
@@ -71,15 +67,14 @@ class AppTheme {
         background: const Color(0xFF121212),
         error: AppColors.error,
       ),
-      textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme).copyWith(
-        displayLarge: GoogleFonts.poppins(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-        ),
-        bodyLarge: GoogleFonts.poppins(
-          color: Colors.white70,
-        ),
-      ),
+      textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme)
+          .copyWith(
+            displayLarge: GoogleFonts.poppins(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+            bodyLarge: GoogleFonts.poppins(color: Colors.white70),
+          ),
       extensions: [
         CycleThemeExtension(
           fertile: AppColors.fertile,

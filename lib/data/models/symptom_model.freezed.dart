@@ -12,7 +12,8 @@ part of 'symptom_model.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 SymptomModel _$SymptomModelFromJson(Map<String, dynamic> json) {
   return _SymptomModel.fromJson(json);
@@ -21,10 +22,12 @@ SymptomModel _$SymptomModelFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$SymptomModel {
   @HiveField(0)
-  DateTime get date => throw _privateConstructorUsedError;
+  String get id => throw _privateConstructorUsedError;
   @HiveField(1)
-  String get name => throw _privateConstructorUsedError;
+  DateTime get date => throw _privateConstructorUsedError;
   @HiveField(2)
+  String get name => throw _privateConstructorUsedError;
+  @HiveField(3)
   int get severity => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -36,13 +39,16 @@ mixin _$SymptomModel {
 /// @nodoc
 abstract class $SymptomModelCopyWith<$Res> {
   factory $SymptomModelCopyWith(
-          SymptomModel value, $Res Function(SymptomModel) then) =
-      _$SymptomModelCopyWithImpl<$Res, SymptomModel>;
+    SymptomModel value,
+    $Res Function(SymptomModel) then,
+  ) = _$SymptomModelCopyWithImpl<$Res, SymptomModel>;
   @useResult
-  $Res call(
-      {@HiveField(0) DateTime date,
-      @HiveField(1) String name,
-      @HiveField(2) int severity});
+  $Res call({
+    @HiveField(0) String id,
+    @HiveField(1) DateTime date,
+    @HiveField(2) String name,
+    @HiveField(3) int severity,
+  });
 }
 
 /// @nodoc
@@ -58,24 +64,32 @@ class _$SymptomModelCopyWithImpl<$Res, $Val extends SymptomModel>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? date = null,
     Object? name = null,
     Object? severity = null,
   }) {
-    return _then(_value.copyWith(
-      date: null == date
-          ? _value.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      severity: null == severity
-          ? _value.severity
-          : severity // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            id: null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                      as String,
+            date: null == date
+                ? _value.date
+                : date // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
+            name: null == name
+                ? _value.name
+                : name // ignore: cast_nullable_to_non_nullable
+                      as String,
+            severity: null == severity
+                ? _value.severity
+                : severity // ignore: cast_nullable_to_non_nullable
+                      as int,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -83,14 +97,17 @@ class _$SymptomModelCopyWithImpl<$Res, $Val extends SymptomModel>
 abstract class _$$SymptomModelImplCopyWith<$Res>
     implements $SymptomModelCopyWith<$Res> {
   factory _$$SymptomModelImplCopyWith(
-          _$SymptomModelImpl value, $Res Function(_$SymptomModelImpl) then) =
-      __$$SymptomModelImplCopyWithImpl<$Res>;
+    _$SymptomModelImpl value,
+    $Res Function(_$SymptomModelImpl) then,
+  ) = __$$SymptomModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {@HiveField(0) DateTime date,
-      @HiveField(1) String name,
-      @HiveField(2) int severity});
+  $Res call({
+    @HiveField(0) String id,
+    @HiveField(1) DateTime date,
+    @HiveField(2) String name,
+    @HiveField(3) int severity,
+  });
 }
 
 /// @nodoc
@@ -98,30 +115,38 @@ class __$$SymptomModelImplCopyWithImpl<$Res>
     extends _$SymptomModelCopyWithImpl<$Res, _$SymptomModelImpl>
     implements _$$SymptomModelImplCopyWith<$Res> {
   __$$SymptomModelImplCopyWithImpl(
-      _$SymptomModelImpl _value, $Res Function(_$SymptomModelImpl) _then)
-      : super(_value, _then);
+    _$SymptomModelImpl _value,
+    $Res Function(_$SymptomModelImpl) _then,
+  ) : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? date = null,
     Object? name = null,
     Object? severity = null,
   }) {
-    return _then(_$SymptomModelImpl(
-      date: null == date
-          ? _value.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      severity: null == severity
-          ? _value.severity
-          : severity // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
+    return _then(
+      _$SymptomModelImpl(
+        id: null == id
+            ? _value.id
+            : id // ignore: cast_nullable_to_non_nullable
+                  as String,
+        date: null == date
+            ? _value.date
+            : date // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
+        name: null == name
+            ? _value.name
+            : name // ignore: cast_nullable_to_non_nullable
+                  as String,
+        severity: null == severity
+            ? _value.severity
+            : severity // ignore: cast_nullable_to_non_nullable
+                  as int,
+      ),
+    );
   }
 }
 
@@ -129,28 +154,33 @@ class __$$SymptomModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 @HiveType(typeId: 2, adapterName: 'SymptomModelAdapter')
 class _$SymptomModelImpl implements _SymptomModel {
-  const _$SymptomModelImpl(
-      {@HiveField(0) required this.date,
-      @HiveField(1) required this.name,
-      @HiveField(2) this.severity = 1});
+  const _$SymptomModelImpl({
+    @HiveField(0) required this.id,
+    @HiveField(1) required this.date,
+    @HiveField(2) required this.name,
+    @HiveField(3) this.severity = 1,
+  });
 
   factory _$SymptomModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$SymptomModelImplFromJson(json);
 
   @override
   @HiveField(0)
-  final DateTime date;
+  final String id;
   @override
   @HiveField(1)
+  final DateTime date;
+  @override
+  @HiveField(2)
   final String name;
   @override
   @JsonKey()
-  @HiveField(2)
+  @HiveField(3)
   final int severity;
 
   @override
   String toString() {
-    return 'SymptomModel(date: $date, name: $name, severity: $severity)';
+    return 'SymptomModel(id: $id, date: $date, name: $name, severity: $severity)';
   }
 
   @override
@@ -158,6 +188,7 @@ class _$SymptomModelImpl implements _SymptomModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$SymptomModelImpl &&
+            (identical(other.id, id) || other.id == id) &&
             (identical(other.date, date) || other.date == date) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.severity, severity) ||
@@ -166,7 +197,7 @@ class _$SymptomModelImpl implements _SymptomModel {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, date, name, severity);
+  int get hashCode => Object.hash(runtimeType, id, date, name, severity);
 
   @JsonKey(ignore: true)
   @override
@@ -176,29 +207,32 @@ class _$SymptomModelImpl implements _SymptomModel {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$SymptomModelImplToJson(
-      this,
-    );
+    return _$$SymptomModelImplToJson(this);
   }
 }
 
 abstract class _SymptomModel implements SymptomModel {
-  const factory _SymptomModel(
-      {@HiveField(0) required final DateTime date,
-      @HiveField(1) required final String name,
-      @HiveField(2) final int severity}) = _$SymptomModelImpl;
+  const factory _SymptomModel({
+    @HiveField(0) required final String id,
+    @HiveField(1) required final DateTime date,
+    @HiveField(2) required final String name,
+    @HiveField(3) final int severity,
+  }) = _$SymptomModelImpl;
 
   factory _SymptomModel.fromJson(Map<String, dynamic> json) =
       _$SymptomModelImpl.fromJson;
 
   @override
   @HiveField(0)
-  DateTime get date;
+  String get id;
   @override
   @HiveField(1)
-  String get name;
+  DateTime get date;
   @override
   @HiveField(2)
+  String get name;
+  @override
+  @HiveField(3)
   int get severity;
   @override
   @JsonKey(ignore: true)

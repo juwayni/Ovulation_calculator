@@ -11,7 +11,9 @@ class PredictionConfidenceCalculator {
 
     List<int> cycleLengths = [];
     for (int i = 0; i < sorted.length - 1; i++) {
-      cycleLengths.add(sorted[i + 1].startDate.difference(sorted[i].startDate).inDays);
+      cycleLengths.add(
+        sorted[i + 1].startDate.difference(sorted[i].startDate).inDays,
+      );
     }
 
     if (cycleLengths.isEmpty) return 0.5;
@@ -20,8 +22,14 @@ class PredictionConfidenceCalculator {
     double mean = cycleLengths.reduce((a, b) => a + b) / cycleLengths.length;
 
     // Calculate variance
-    double variance = cycleLengths.map((l) => (l - mean) * (l - mean)).reduce((a, b) => a + b) / cycleLengths.length;
-    double stdDev = variance > 0 ? (variance * 1).abs() : 0; // Simplified stdDev for this example or just use variance
+    double variance =
+        cycleLengths
+            .map((l) => (l - mean) * (l - mean))
+            .reduce((a, b) => a + b) /
+        cycleLengths.length;
+    double stdDev = variance > 0
+        ? (variance * 1).abs()
+        : 0; // Simplified stdDev for this example or just use variance
 
     // Higher variance = lower confidence
     // If stdDev is 0, confidence is high. If stdDev is 7 days, confidence is low.

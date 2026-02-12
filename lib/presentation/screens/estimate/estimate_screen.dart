@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/theme_extension.dart';
 import '../../widgets/cycle_ring_painter.dart';
 import '../../providers/cycle_provider.dart';
+import '../../providers/log_provider.dart';
 import '../../../domain/entities/cycle_entity.dart';
+import '../../../data/models/temperature_model.dart';
 
 class EstimateScreen extends ConsumerStatefulWidget {
   const EstimateScreen({super.key});
@@ -19,6 +22,7 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
   Widget build(BuildContext context) {
     final cycleTheme = Theme.of(context).extension<CycleThemeExtension>()!;
     final cycleAsync = ref.watch(currentCycleProvider);
+    final tempsAsync = ref.watch(temperaturesProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -26,7 +30,10 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
           icon: const Icon(Icons.chevron_left),
           onPressed: () => Navigator.maybePop(context),
         ),
-        title: const Text('Estimate', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Estimate',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
@@ -35,14 +42,19 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
         ],
       ),
       body: cycleAsync.when(
-        data: (cycle) => _buildContent(cycle, cycleTheme),
+        data: (cycle) =>
+            _buildContent(cycle, cycleTheme, tempsAsync.value ?? []),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
       ),
     );
   }
 
-  Widget _buildContent(CycleEntity cycle, CycleThemeExtension theme) {
+  Widget _buildContent(
+    CycleEntity cycle,
+    CycleThemeExtension theme,
+    List<TemperatureModel> temps,
+  ) {
     final now = DateTime.now();
     int currentDayOfCycle = now.difference(cycle.startDate).inDays + 1;
     currentDayOfCycle = currentDayOfCycle.clamp(1, cycle.cycleLength);
@@ -53,22 +65,26 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
         children: [
           _buildCycleRingWithLabels(cycle, currentDayOfCycle, theme),
           const SizedBox(height: 40),
-          _buildTemperatureCurve(theme),
+          _buildTemperatureCurve(theme, temps),
         ],
       ),
     );
   }
 
-  Widget _buildCycleRingWithLabels(CycleEntity cycle, int currentDay, CycleThemeExtension theme) {
+  Widget _buildCycleRingWithLabels(
+    CycleEntity cycle,
+    int currentDay,
+    CycleThemeExtension theme,
+  ) {
     List<int> periodDays = List.generate(cycle.periodLength, (i) => i + 1);
-    int ovulationDayIndex = cycle.ovulationDay.difference(cycle.startDate).inDays + 1;
+    int ovulationDayIndex =
+        cycle.ovulationDay.difference(cycle.startDate).inDays + 1;
     List<int> fertileDays = List.generate(6, (i) => ovulationDayIndex - 4 + i);
     List<int> pmsDays = List.generate(3, (i) => cycle.cycleLength - i);
 
     return Stack(
       alignment: Alignment.center,
       children: [
-        // Ring
         SizedBox(
           width: 300,
           height: 300,
@@ -86,22 +102,36 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
             ),
           ),
         ),
-        // Labels
         Positioned(top: 20, left: 20, child: _buildRingLabel('PMS', theme.pms)),
-        Positioned(top: 20, right: 20, child: _buildRingLabel('Period', theme.period)),
-        Positioned(bottom: 50, right: 10, child: _buildRingLabel('Fertile', theme.fertile)),
+        Positioned(
+          top: 20,
+          right: 20,
+          child: _buildRingLabel('Period', theme.period),
+        ),
+        Positioned(
+          bottom: 50,
+          right: 10,
+          child: _buildRingLabel('Fertile', theme.fertile),
+        ),
 
-        // Center Content
         Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.favorite, color: theme.period.withOpacity(0.8), size: 24),
+                Icon(
+                  Icons.favorite,
+                  color: theme.period.withOpacity(0.8),
+                  size: 24,
+                ),
                 Transform.translate(
                   offset: const Offset(-8, 0),
-                  child: Icon(Icons.favorite, color: theme.period.withOpacity(0.5), size: 24),
+                  child: Icon(
+                    Icons.favorite,
+                    color: theme.period.withOpacity(0.5),
+                    size: 24,
+                  ),
                 ),
               ],
             ),
@@ -130,12 +160,76 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
       ),
       child: Text(
         text,
-        style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12),
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
       ),
     );
   }
 
-  Widget _buildTemperatureCurve(CycleThemeExtension theme) {
+  Widget _buildTemperatureCurve(
+    CycleThemeExtension theme,
+    List<TemperatureModel> temps,
+  ) {
+    // Sort temps by date
+    final sortedTemps = List<TemperatureModel>.from(temps)
+      ..sort((a, b) => a.date.compareTo(b.date));
+
+    // Get last 7 readings or fewer
+    final lastTemps = sortedTemps.length > 7
+        ? sortedTemps.sublist(sortedTemps.length - 7)
+        : sortedTemps;
+
+    final List<FlSpot> spots = [];
+    for (int i = 0; i < lastTemps.length; i++) {
+      spots.add(FlSpot(i.toDouble(), lastTemps[i].value));
+    }
+
+    if (spots.isEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(left: 8.0),
+            child: Text(
+              'Temperature Curve',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Container(
+            height: 200,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade50,
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.thermostat,
+                  color: Colors.pink.withOpacity(0.2),
+                  size: 48,
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'No BBT data yet',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextButton(
+                  onPressed: () => context.push('/log-temperature'),
+                  child: const Text('Log Temperature'),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -160,71 +254,54 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
                 show: true,
                 drawVerticalLine: false,
                 horizontalInterval: 1,
-                getDrawingHorizontalLine: (value) => FlLine(
-                  color: Colors.grey.withOpacity(0.2),
-                  strokeWidth: 1,
-                ),
+                getDrawingHorizontalLine: (value) =>
+                    FlLine(color: Colors.grey.withOpacity(0.2), strokeWidth: 1),
               ),
               titlesData: FlTitlesData(
                 show: true,
-                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                topTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    interval: 1,
-                    getTitlesWidget: (value, meta) => Text('${value.toInt()}°F', style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                    interval: 0.5,
+                    getTitlesWidget: (value, meta) => Text(
+                      '${value.toStringAsFixed(1)}°',
+                      style: const TextStyle(fontSize: 10, color: Colors.grey),
+                    ),
                     reservedSize: 35,
                   ),
                 ),
                 bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    interval: 1,
-                    getTitlesWidget: (value, meta) {
-                      if (value < 3 || value > 9) return const SizedBox();
-                      return Text('${value.toInt()}', style: const TextStyle(fontSize: 10, color: Colors.grey));
-                    },
+                    getTitlesWidget: (value, meta) => Text(
+                      '${value.toInt()}',
+                      style: const TextStyle(fontSize: 10, color: Colors.grey),
+                    ),
                   ),
                 ),
               ),
               borderData: FlBorderData(show: false),
-              minX: 2.5,
-              maxX: 9.5,
-              minY: 94.5,
-              maxY: 99.5,
               lineBarsData: [
                 LineChartBarData(
-                  spots: const [
-                    FlSpot(3, 96.0),
-                    FlSpot(4, 96.5),
-                    FlSpot(5, 95.8),
-                    FlSpot(6, 96.8),
-                    FlSpot(7, 98.2),
-                    FlSpot(8, 97.2),
-                    FlSpot(9, 95.5),
-                  ],
+                  spots: spots,
                   isCurved: true,
                   color: theme.period,
                   barWidth: 2,
                   isStrokeCapRound: true,
-                  dotData: FlDotData(
-                    show: true,
-                    getDotPainter: (spot, percent, barData, index) {
-                      if (spot.x == 5) {
-                        return FlDotCirclePainter(
-                          radius: 6,
-                          color: theme.period,
-                          strokeWidth: 0,
-                        );
-                      }
-                      return FlDotCirclePainter(radius: 0, color: Colors.transparent);
-                    },
-                  ),
+                  dotData: const FlDotData(show: true),
                   belowBarData: BarAreaData(
                     show: true,
                     gradient: LinearGradient(
-                      colors: [theme.period.withOpacity(0.3), theme.period.withOpacity(0.0)],
+                      colors: [
+                        theme.period.withOpacity(0.3),
+                        theme.period.withOpacity(0.0),
+                      ],
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                     ),

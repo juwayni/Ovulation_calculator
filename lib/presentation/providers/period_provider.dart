@@ -12,7 +12,8 @@ class PeriodNotifier extends StateNotifier<AsyncValue<void>> {
   final IPeriodRepository _repository;
   final Ref _ref;
 
-  PeriodNotifier(this._repository, this._ref) : super(const AsyncValue.data(null));
+  PeriodNotifier(this._repository, this._ref)
+    : super(const AsyncValue.data(null));
 
   Future<void> addPeriod(PeriodModel period) async {
     state = const AsyncValue.loading();
@@ -24,7 +25,8 @@ class PeriodNotifier extends StateNotifier<AsyncValue<void>> {
   }
 }
 
-final periodActionProvider = StateNotifierProvider<PeriodNotifier, AsyncValue<void>>((ref) {
-  final repository = ref.watch(periodRepositoryProvider);
-  return PeriodNotifier(repository, ref);
-});
+final periodActionProvider =
+    StateNotifierProvider<PeriodNotifier, AsyncValue<void>>((ref) {
+      final repository = ref.watch(periodRepositoryProvider);
+      return PeriodNotifier(repository, ref);
+    });

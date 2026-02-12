@@ -23,20 +23,25 @@ class AppButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: isPrimary ? Theme.of(context).colorScheme.primary : Colors.white,
-          foregroundColor: isPrimary ? Colors.white : Theme.of(context).colorScheme.primary,
+          backgroundColor: isPrimary
+              ? Theme.of(context).colorScheme.primary
+              : Colors.white,
+          foregroundColor: isPrimary
+              ? Colors.white
+              : Theme.of(context).colorScheme.primary,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-            side: isPrimary ? BorderSide.none : BorderSide(color: Theme.of(context).colorScheme.primary),
+            borderRadius: BorderRadius.circular(
+              AppConstants.borderRadiusMedium,
+            ),
+            side: isPrimary
+                ? BorderSide.none
+                : BorderSide(color: Theme.of(context).colorScheme.primary),
           ),
         ),
         child: Text(
           text,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ),
     );

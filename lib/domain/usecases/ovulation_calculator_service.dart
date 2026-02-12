@@ -21,7 +21,9 @@ class OvulationCalculatorService {
         int totalDays = 0;
         int count = 0;
         for (int i = 0; i < sortedPeriods.length - 1; i++) {
-          totalDays += sortedPeriods[i].startDate.difference(sortedPeriods[i + 1].startDate).inDays;
+          totalDays += sortedPeriods[i].startDate
+              .difference(sortedPeriods[i + 1].startDate)
+              .inDays;
           count++;
           if (count >= 3) break;
         }
@@ -35,8 +37,8 @@ class OvulationCalculatorService {
           totalPeriodDays += p.endDate!.difference(p.startDate).inDays + 1;
           periodCount++;
         } else if (p == sortedPeriods.first) {
-             // If current period is ongoing, we don't know the end date yet,
-             // but we can use default or last known.
+          // If current period is ongoing, we don't know the end date yet,
+          // but we can use default or last known.
         }
         if (periodCount >= 3) break;
       }
@@ -49,7 +51,9 @@ class OvulationCalculatorService {
 
     // Find the most recent period start date
     DateTime lastStartDate = lastPeriods.isNotEmpty
-        ? lastPeriods.map((e) => e.startDate).reduce((a, b) => a.isAfter(b) ? a : b)
+        ? lastPeriods
+              .map((e) => e.startDate)
+              .reduce((a, b) => a.isAfter(b) ? a : b)
         : now.subtract(Duration(days: defaultCycleLength));
 
     // Determine if we are in the current cycle or looking at the next one
@@ -64,13 +68,15 @@ class OvulationCalculatorService {
     // If the reference date is BEFORE the last recorded period (unlikely for current status),
     // but let's handle it by going backwards if needed.
     while (now.isBefore(cycleStartDate)) {
-       // Only go back if we are trying to find the cycle containing 'now'
-       if (now.difference(cycleStartDate).inDays.abs() < avgCycleLength) break;
-       cycleStartDate = cycleStartDate.subtract(Duration(days: avgCycleLength));
+      // Only go back if we are trying to find the cycle containing 'now'
+      if (now.difference(cycleStartDate).inDays.abs() < avgCycleLength) break;
+      cycleStartDate = cycleStartDate.subtract(Duration(days: avgCycleLength));
     }
 
     final nextStartDate = cycleStartDate.add(Duration(days: avgCycleLength));
-    final ovulationDay = nextStartDate.subtract(const Duration(days: defaultLutealPhaseLength));
+    final ovulationDay = nextStartDate.subtract(
+      const Duration(days: defaultLutealPhaseLength),
+    );
 
     return CycleEntity(
       startDate: cycleStartDate,

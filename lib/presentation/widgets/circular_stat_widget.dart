@@ -47,10 +47,7 @@ class CircularStatWidget extends StatelessWidget {
                   ),
                   Text(
                     'days',
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.grey.shade600,
-                    ),
+                    style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
                   ),
                 ],
               ),
@@ -61,10 +58,7 @@ class CircularStatWidget extends StatelessWidget {
         Text(
           subLabel,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
         ),
       ],
     );
@@ -110,12 +104,14 @@ class _CircularProgressPainter extends CustomPainter {
     );
 
     // Draw dots at intervals like in the design
-    final dotPaint = Paint()..color = color..style = PaintingStyle.fill;
+    final dotPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
     for (int i = 0; i < 4; i++) {
-        final angle = -pi / 2 + (i * pi / 2);
-        final x = center.dx + (radius - strokeWidth / 2) * cos(angle);
-        final y = center.dy + (radius - strokeWidth / 2) * sin(angle);
-        canvas.drawCircle(Offset(x, y), 2, dotPaint);
+      final angle = -pi / 2 + (i * pi / 2);
+      final x = center.dx + (radius - strokeWidth / 2) * cos(angle);
+      final y = center.dy + (radius - strokeWidth / 2) * sin(angle);
+      canvas.drawCircle(Offset(x, y), 2, dotPaint);
     }
   }
 

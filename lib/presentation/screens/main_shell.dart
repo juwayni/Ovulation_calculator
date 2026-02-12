@@ -44,10 +44,7 @@ class MainShell extends StatelessWidget {
               icon: Icon(Icons.favorite_rounded),
               label: 'Insight',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.menu),
-              label: 'Menu',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Menu'),
           ],
         ),
       ),
@@ -58,6 +55,7 @@ class MainShell extends StatelessWidget {
     final String location = GoRouterState.of(context).uri.path;
     if (location.startsWith('/estimate')) return 1;
     if (location.startsWith('/analysis')) return 2;
+    if (location.startsWith('/menu')) return 3;
     return 0;
   }
 
@@ -73,7 +71,7 @@ class MainShell extends StatelessWidget {
         context.go('/analysis');
         break;
       case 3:
-        // Handle menu
+        context.go('/menu');
         break;
     }
   }

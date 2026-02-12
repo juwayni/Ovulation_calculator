@@ -12,5 +12,6 @@ class NoteModel with _$NoteModel {
     @HiveField(1) required String content,
   }) = _NoteModel;
 
-  factory NoteModel.fromJson(Map<String, dynamic> json) => _$NoteModelFromJson(json);
+  factory NoteModel.fromJson(Map<String, dynamic> json) =>
+      _$NoteModelFromJson(json);
 }

@@ -17,18 +17,21 @@ class TemperatureModelAdapter extends TypeAdapter<_$TemperatureModelImpl> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return _$TemperatureModelImpl(
-      date: fields[0] as DateTime,
-      value: fields[1] as double,
+      id: fields[0] as String,
+      date: fields[1] as DateTime,
+      value: fields[2] as double,
     );
   }
 
   @override
   void write(BinaryWriter writer, _$TemperatureModelImpl obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
-      ..write(obj.date)
+      ..write(obj.id)
       ..writeByte(1)
+      ..write(obj.date)
+      ..writeByte(2)
       ..write(obj.value);
   }
 
@@ -48,15 +51,17 @@ class TemperatureModelAdapter extends TypeAdapter<_$TemperatureModelImpl> {
 // **************************************************************************
 
 _$TemperatureModelImpl _$$TemperatureModelImplFromJson(
-        Map<String, dynamic> json) =>
-    _$TemperatureModelImpl(
-      date: DateTime.parse(json['date'] as String),
-      value: (json['value'] as num).toDouble(),
-    );
+  Map<String, dynamic> json,
+) => _$TemperatureModelImpl(
+  id: json['id'] as String,
+  date: DateTime.parse(json['date'] as String),
+  value: (json['value'] as num).toDouble(),
+);
 
 Map<String, dynamic> _$$TemperatureModelImplToJson(
-        _$TemperatureModelImpl instance) =>
-    <String, dynamic>{
-      'date': instance.date.toIso8601String(),
-      'value': instance.value,
-    };
+  _$TemperatureModelImpl instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'date': instance.date.toIso8601String(),
+  'value': instance.value,
+};

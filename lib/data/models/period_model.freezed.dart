@@ -12,7 +12,8 @@ part of 'period_model.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 PeriodModel _$PeriodModelFromJson(Map<String, dynamic> json) {
   return _PeriodModel.fromJson(json);
@@ -36,13 +37,15 @@ mixin _$PeriodModel {
 /// @nodoc
 abstract class $PeriodModelCopyWith<$Res> {
   factory $PeriodModelCopyWith(
-          PeriodModel value, $Res Function(PeriodModel) then) =
-      _$PeriodModelCopyWithImpl<$Res, PeriodModel>;
+    PeriodModel value,
+    $Res Function(PeriodModel) then,
+  ) = _$PeriodModelCopyWithImpl<$Res, PeriodModel>;
   @useResult
-  $Res call(
-      {@HiveField(0) String id,
-      @HiveField(1) DateTime startDate,
-      @HiveField(2) DateTime? endDate});
+  $Res call({
+    @HiveField(0) String id,
+    @HiveField(1) DateTime startDate,
+    @HiveField(2) DateTime? endDate,
+  });
 }
 
 /// @nodoc
@@ -62,20 +65,23 @@ class _$PeriodModelCopyWithImpl<$Res, $Val extends PeriodModel>
     Object? startDate = null,
     Object? endDate = freezed,
   }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      startDate: null == startDate
-          ? _value.startDate
-          : startDate // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      endDate: freezed == endDate
-          ? _value.endDate
-          : endDate // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            id: null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                      as String,
+            startDate: null == startDate
+                ? _value.startDate
+                : startDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
+            endDate: freezed == endDate
+                ? _value.endDate
+                : endDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -83,14 +89,16 @@ class _$PeriodModelCopyWithImpl<$Res, $Val extends PeriodModel>
 abstract class _$$PeriodModelImplCopyWith<$Res>
     implements $PeriodModelCopyWith<$Res> {
   factory _$$PeriodModelImplCopyWith(
-          _$PeriodModelImpl value, $Res Function(_$PeriodModelImpl) then) =
-      __$$PeriodModelImplCopyWithImpl<$Res>;
+    _$PeriodModelImpl value,
+    $Res Function(_$PeriodModelImpl) then,
+  ) = __$$PeriodModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {@HiveField(0) String id,
-      @HiveField(1) DateTime startDate,
-      @HiveField(2) DateTime? endDate});
+  $Res call({
+    @HiveField(0) String id,
+    @HiveField(1) DateTime startDate,
+    @HiveField(2) DateTime? endDate,
+  });
 }
 
 /// @nodoc
@@ -98,8 +106,9 @@ class __$$PeriodModelImplCopyWithImpl<$Res>
     extends _$PeriodModelCopyWithImpl<$Res, _$PeriodModelImpl>
     implements _$$PeriodModelImplCopyWith<$Res> {
   __$$PeriodModelImplCopyWithImpl(
-      _$PeriodModelImpl _value, $Res Function(_$PeriodModelImpl) _then)
-      : super(_value, _then);
+    _$PeriodModelImpl _value,
+    $Res Function(_$PeriodModelImpl) _then,
+  ) : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -108,20 +117,22 @@ class __$$PeriodModelImplCopyWithImpl<$Res>
     Object? startDate = null,
     Object? endDate = freezed,
   }) {
-    return _then(_$PeriodModelImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      startDate: null == startDate
-          ? _value.startDate
-          : startDate // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      endDate: freezed == endDate
-          ? _value.endDate
-          : endDate // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-    ));
+    return _then(
+      _$PeriodModelImpl(
+        id: null == id
+            ? _value.id
+            : id // ignore: cast_nullable_to_non_nullable
+                  as String,
+        startDate: null == startDate
+            ? _value.startDate
+            : startDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
+        endDate: freezed == endDate
+            ? _value.endDate
+            : endDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+      ),
+    );
   }
 }
 
@@ -129,10 +140,11 @@ class __$$PeriodModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 @HiveType(typeId: 0, adapterName: 'PeriodModelAdapter')
 class _$PeriodModelImpl implements _PeriodModel {
-  const _$PeriodModelImpl(
-      {@HiveField(0) required this.id,
-      @HiveField(1) required this.startDate,
-      @HiveField(2) this.endDate});
+  const _$PeriodModelImpl({
+    @HiveField(0) required this.id,
+    @HiveField(1) required this.startDate,
+    @HiveField(2) this.endDate,
+  });
 
   factory _$PeriodModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$PeriodModelImplFromJson(json);
@@ -175,17 +187,16 @@ class _$PeriodModelImpl implements _PeriodModel {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$PeriodModelImplToJson(
-      this,
-    );
+    return _$$PeriodModelImplToJson(this);
   }
 }
 
 abstract class _PeriodModel implements PeriodModel {
-  const factory _PeriodModel(
-      {@HiveField(0) required final String id,
-      @HiveField(1) required final DateTime startDate,
-      @HiveField(2) final DateTime? endDate}) = _$PeriodModelImpl;
+  const factory _PeriodModel({
+    @HiveField(0) required final String id,
+    @HiveField(1) required final DateTime startDate,
+    @HiveField(2) final DateTime? endDate,
+  }) = _$PeriodModelImpl;
 
   factory _PeriodModel.fromJson(Map<String, dynamic> json) =
       _$PeriodModelImpl.fromJson;

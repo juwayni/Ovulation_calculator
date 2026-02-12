@@ -38,11 +38,14 @@ class DateSelector extends ConsumerWidget {
 
               // Check if date is in any period
               final isInPeriod = periods.any((p) {
-                  if (p.endDate == null) {
-                      return DateUtils.isSameDay(date, p.startDate) || date.isAfter(p.startDate);
-                  }
-                  return (date.isAfter(p.startDate) || DateUtils.isSameDay(date, p.startDate)) &&
-                         (date.isBefore(p.endDate!) || DateUtils.isSameDay(date, p.endDate!));
+                if (p.endDate == null) {
+                  return DateUtils.isSameDay(date, p.startDate) ||
+                      date.isAfter(p.startDate);
+                }
+                return (date.isAfter(p.startDate) ||
+                        DateUtils.isSameDay(date, p.startDate)) &&
+                    (date.isBefore(p.endDate!) ||
+                        DateUtils.isSameDay(date, p.endDate!));
               });
 
               return GestureDetector(
@@ -53,7 +56,13 @@ class DateSelector extends ConsumerWidget {
                   child: Column(
                     children: [
                       if (isToday)
-                        const Text('Today', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold))
+                        const Text(
+                          'Today',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
                       else
                         const SizedBox(height: 15),
                       Text(
@@ -71,7 +80,10 @@ class DateSelector extends ConsumerWidget {
                           shape: BoxShape.circle,
                           color: isSelected ? Colors.pink : Colors.transparent,
                           border: isInPeriod && !isSelected
-                              ? Border.all(color: Colors.pink.withOpacity(0.5), width: 1.5)
+                              ? Border.all(
+                                  color: Colors.pink.withOpacity(0.5),
+                                  width: 1.5,
+                                )
                               : null,
                         ),
                         child: Center(
@@ -79,7 +91,9 @@ class DateSelector extends ConsumerWidget {
                             date.day.toString(),
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight: isSelected || isToday ? FontWeight.bold : FontWeight.normal,
+                              fontWeight: isSelected || isToday
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
                               color: isSelected ? Colors.white : Colors.black,
                             ),
                           ),
@@ -104,10 +118,7 @@ class DateSelector extends ConsumerWidget {
         const SizedBox(width: 16),
         Text(
           DateFormat('MMMM yyyy').format(selectedDate),
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(width: 16),
         const Icon(Icons.chevron_right, color: Colors.grey),

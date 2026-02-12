@@ -12,7 +12,8 @@ part of 'temperature_model.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 TemperatureModel _$TemperatureModelFromJson(Map<String, dynamic> json) {
   return _TemperatureModel.fromJson(json);
@@ -21,8 +22,10 @@ TemperatureModel _$TemperatureModelFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$TemperatureModel {
   @HiveField(0)
-  DateTime get date => throw _privateConstructorUsedError;
+  String get id => throw _privateConstructorUsedError;
   @HiveField(1)
+  DateTime get date => throw _privateConstructorUsedError;
+  @HiveField(2)
   double get value => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -34,10 +37,15 @@ mixin _$TemperatureModel {
 /// @nodoc
 abstract class $TemperatureModelCopyWith<$Res> {
   factory $TemperatureModelCopyWith(
-          TemperatureModel value, $Res Function(TemperatureModel) then) =
-      _$TemperatureModelCopyWithImpl<$Res, TemperatureModel>;
+    TemperatureModel value,
+    $Res Function(TemperatureModel) then,
+  ) = _$TemperatureModelCopyWithImpl<$Res, TemperatureModel>;
   @useResult
-  $Res call({@HiveField(0) DateTime date, @HiveField(1) double value});
+  $Res call({
+    @HiveField(0) String id,
+    @HiveField(1) DateTime date,
+    @HiveField(2) double value,
+  });
 }
 
 /// @nodoc
@@ -52,58 +60,71 @@ class _$TemperatureModelCopyWithImpl<$Res, $Val extends TemperatureModel>
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? date = null,
-    Object? value = null,
-  }) {
-    return _then(_value.copyWith(
-      date: null == date
-          ? _value.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      value: null == value
-          ? _value.value
-          : value // ignore: cast_nullable_to_non_nullable
-              as double,
-    ) as $Val);
+  $Res call({Object? id = null, Object? date = null, Object? value = null}) {
+    return _then(
+      _value.copyWith(
+            id: null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                      as String,
+            date: null == date
+                ? _value.date
+                : date // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
+            value: null == value
+                ? _value.value
+                : value // ignore: cast_nullable_to_non_nullable
+                      as double,
+          )
+          as $Val,
+    );
   }
 }
 
 /// @nodoc
 abstract class _$$TemperatureModelImplCopyWith<$Res>
     implements $TemperatureModelCopyWith<$Res> {
-  factory _$$TemperatureModelImplCopyWith(_$TemperatureModelImpl value,
-          $Res Function(_$TemperatureModelImpl) then) =
-      __$$TemperatureModelImplCopyWithImpl<$Res>;
+  factory _$$TemperatureModelImplCopyWith(
+    _$TemperatureModelImpl value,
+    $Res Function(_$TemperatureModelImpl) then,
+  ) = __$$TemperatureModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({@HiveField(0) DateTime date, @HiveField(1) double value});
+  $Res call({
+    @HiveField(0) String id,
+    @HiveField(1) DateTime date,
+    @HiveField(2) double value,
+  });
 }
 
 /// @nodoc
 class __$$TemperatureModelImplCopyWithImpl<$Res>
     extends _$TemperatureModelCopyWithImpl<$Res, _$TemperatureModelImpl>
     implements _$$TemperatureModelImplCopyWith<$Res> {
-  __$$TemperatureModelImplCopyWithImpl(_$TemperatureModelImpl _value,
-      $Res Function(_$TemperatureModelImpl) _then)
-      : super(_value, _then);
+  __$$TemperatureModelImplCopyWithImpl(
+    _$TemperatureModelImpl _value,
+    $Res Function(_$TemperatureModelImpl) _then,
+  ) : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? date = null,
-    Object? value = null,
-  }) {
-    return _then(_$TemperatureModelImpl(
-      date: null == date
-          ? _value.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      value: null == value
-          ? _value.value
-          : value // ignore: cast_nullable_to_non_nullable
-              as double,
-    ));
+  $Res call({Object? id = null, Object? date = null, Object? value = null}) {
+    return _then(
+      _$TemperatureModelImpl(
+        id: null == id
+            ? _value.id
+            : id // ignore: cast_nullable_to_non_nullable
+                  as String,
+        date: null == date
+            ? _value.date
+            : date // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
+        value: null == value
+            ? _value.value
+            : value // ignore: cast_nullable_to_non_nullable
+                  as double,
+      ),
+    );
   }
 }
 
@@ -111,22 +132,28 @@ class __$$TemperatureModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 @HiveType(typeId: 1, adapterName: 'TemperatureModelAdapter')
 class _$TemperatureModelImpl implements _TemperatureModel {
-  const _$TemperatureModelImpl(
-      {@HiveField(0) required this.date, @HiveField(1) required this.value});
+  const _$TemperatureModelImpl({
+    @HiveField(0) required this.id,
+    @HiveField(1) required this.date,
+    @HiveField(2) required this.value,
+  });
 
   factory _$TemperatureModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$TemperatureModelImplFromJson(json);
 
   @override
   @HiveField(0)
-  final DateTime date;
+  final String id;
   @override
   @HiveField(1)
+  final DateTime date;
+  @override
+  @HiveField(2)
   final double value;
 
   @override
   String toString() {
-    return 'TemperatureModel(date: $date, value: $value)';
+    return 'TemperatureModel(id: $id, date: $date, value: $value)';
   }
 
   @override
@@ -134,42 +161,48 @@ class _$TemperatureModelImpl implements _TemperatureModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$TemperatureModelImpl &&
+            (identical(other.id, id) || other.id == id) &&
             (identical(other.date, date) || other.date == date) &&
             (identical(other.value, value) || other.value == value));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, date, value);
+  int get hashCode => Object.hash(runtimeType, id, date, value);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$TemperatureModelImplCopyWith<_$TemperatureModelImpl> get copyWith =>
       __$$TemperatureModelImplCopyWithImpl<_$TemperatureModelImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$TemperatureModelImplToJson(
-      this,
-    );
+    return _$$TemperatureModelImplToJson(this);
   }
 }
 
 abstract class _TemperatureModel implements TemperatureModel {
-  const factory _TemperatureModel(
-      {@HiveField(0) required final DateTime date,
-      @HiveField(1) required final double value}) = _$TemperatureModelImpl;
+  const factory _TemperatureModel({
+    @HiveField(0) required final String id,
+    @HiveField(1) required final DateTime date,
+    @HiveField(2) required final double value,
+  }) = _$TemperatureModelImpl;
 
   factory _TemperatureModel.fromJson(Map<String, dynamic> json) =
       _$TemperatureModelImpl.fromJson;
 
   @override
   @HiveField(0)
-  DateTime get date;
+  String get id;
   @override
   @HiveField(1)
+  DateTime get date;
+  @override
+  @HiveField(2)
   double get value;
   @override
   @JsonKey(ignore: true)

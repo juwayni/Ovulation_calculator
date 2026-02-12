@@ -74,8 +74,10 @@ class CycleRingPainter extends CustomPainter {
 
       // If it's the ovulation day, add a white dot inside
       if (day == ovulationDay) {
-          final whitePaint = Paint()..color = Colors.white..style = PaintingStyle.fill;
-          canvas.drawCircle(dotCenter, 2, whitePaint);
+        final whitePaint = Paint()
+          ..color = Colors.white
+          ..style = PaintingStyle.fill;
+        canvas.drawCircle(dotCenter, 2, whitePaint);
       }
     }
   }
@@ -83,7 +85,7 @@ class CycleRingPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CycleRingPainter oldDelegate) {
     return oldDelegate.currentDay != currentDay ||
-           oldDelegate.totalDays != totalDays ||
-           oldDelegate.ovulationDay != ovulationDay;
+        oldDelegate.totalDays != totalDays ||
+        oldDelegate.ovulationDay != ovulationDay;
   }
 }

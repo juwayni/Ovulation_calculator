@@ -24,7 +24,9 @@ class AppColors {
   static const Color fertile = Color(0xFF40E0D0); // Teal
   static const Color follicular = Color(0xFF45B7AF);
   static const Color luteal = Color(0xFF8E44AD);
-  static const Color ovulation = Color(0xFF40E0D0); // Usually same as fertile or distinct
+  static const Color ovulation = Color(
+    0xFF40E0D0,
+  ); // Usually same as fertile or distinct
 
   static const Color temperatureLine = Color(0xFFFF6B81);
   static const Color temperatureArea = Color(0xFFFFEEF0);
