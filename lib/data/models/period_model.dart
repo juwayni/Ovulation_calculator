@@ -13,5 +13,6 @@ class PeriodModel with _$PeriodModel {
     @HiveField(2) DateTime? endDate,
   }) = _PeriodModel;
 
-  factory PeriodModel.fromJson(Map<String, dynamic> json) => _$PeriodModelFromJson(json);
+  factory PeriodModel.fromJson(Map<String, dynamic> json) =>
+      _$PeriodModelFromJson(json);
 }

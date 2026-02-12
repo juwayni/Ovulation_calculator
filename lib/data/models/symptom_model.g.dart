@@ -17,21 +17,24 @@ class SymptomModelAdapter extends TypeAdapter<_$SymptomModelImpl> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return _$SymptomModelImpl(
-      date: fields[0] as DateTime,
-      name: fields[1] as String,
-      severity: fields[2] as int,
+      id: fields[0] as String,
+      date: fields[1] as DateTime,
+      name: fields[2] as String,
+      severity: fields[3] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, _$SymptomModelImpl obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
-      ..write(obj.date)
+      ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.name)
+      ..write(obj.date)
       ..writeByte(2)
+      ..write(obj.name)
+      ..writeByte(3)
       ..write(obj.severity);
   }
 
@@ -52,6 +55,7 @@ class SymptomModelAdapter extends TypeAdapter<_$SymptomModelImpl> {
 
 _$SymptomModelImpl _$$SymptomModelImplFromJson(Map<String, dynamic> json) =>
     _$SymptomModelImpl(
+      id: json['id'] as String,
       date: DateTime.parse(json['date'] as String),
       name: json['name'] as String,
       severity: (json['severity'] as num?)?.toInt() ?? 1,
@@ -59,6 +63,7 @@ _$SymptomModelImpl _$$SymptomModelImplFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$$SymptomModelImplToJson(_$SymptomModelImpl instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'date': instance.date.toIso8601String(),
       'name': instance.name,
       'severity': instance.severity,

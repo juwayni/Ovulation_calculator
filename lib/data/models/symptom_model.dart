@@ -8,10 +8,12 @@ part 'symptom_model.g.dart';
 class SymptomModel with _$SymptomModel {
   @HiveType(typeId: 2, adapterName: 'SymptomModelAdapter')
   const factory SymptomModel({
-    @HiveField(0) required DateTime date,
-    @HiveField(1) required String name,
-    @HiveField(2) @Default(1) int severity, // 1: Mild, 2: Moderate, 3: Severe
+    @HiveField(0) required String id,
+    @HiveField(1) required DateTime date,
+    @HiveField(2) required String name,
+    @HiveField(3) @Default(1) int severity, // 1: Mild, 2: Moderate, 3: Severe
   }) = _SymptomModel;
 
-  factory SymptomModel.fromJson(Map<String, dynamic> json) => _$SymptomModelFromJson(json);
+  factory SymptomModel.fromJson(Map<String, dynamic> json) =>
+      _$SymptomModelFromJson(json);
 }

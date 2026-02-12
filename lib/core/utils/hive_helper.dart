@@ -3,6 +3,7 @@ import '../../data/models/period_model.dart';
 import '../../data/models/temperature_model.dart';
 import '../../data/models/symptom_model.dart';
 import '../../data/models/note_model.dart';
+import '../../data/models/user_model.dart';
 
 class HiveHelper {
   HiveHelper._();
@@ -15,5 +16,6 @@ class HiveHelper {
     Hive.registerAdapter(TemperatureModelAdapter());
     Hive.registerAdapter(SymptomModelAdapter());
     Hive.registerAdapter(NoteModelAdapter());
+    Hive.registerAdapter(UserModelAdapter());
   }
 }

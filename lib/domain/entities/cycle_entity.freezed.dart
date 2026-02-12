@@ -12,7 +12,8 @@ part of 'cycle_entity.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 /// @nodoc
 mixin _$CycleEntity {
@@ -32,17 +33,19 @@ mixin _$CycleEntity {
 /// @nodoc
 abstract class $CycleEntityCopyWith<$Res> {
   factory $CycleEntityCopyWith(
-          CycleEntity value, $Res Function(CycleEntity) then) =
-      _$CycleEntityCopyWithImpl<$Res, CycleEntity>;
+    CycleEntity value,
+    $Res Function(CycleEntity) then,
+  ) = _$CycleEntityCopyWithImpl<$Res, CycleEntity>;
   @useResult
-  $Res call(
-      {DateTime startDate,
-      int cycleLength,
-      int periodLength,
-      DateTime ovulationDay,
-      DateTime fertileWindowStart,
-      DateTime fertileWindowEnd,
-      int lutealPhaseLength});
+  $Res call({
+    DateTime startDate,
+    int cycleLength,
+    int periodLength,
+    DateTime ovulationDay,
+    DateTime fertileWindowStart,
+    DateTime fertileWindowEnd,
+    int lutealPhaseLength,
+  });
 }
 
 /// @nodoc
@@ -66,36 +69,39 @@ class _$CycleEntityCopyWithImpl<$Res, $Val extends CycleEntity>
     Object? fertileWindowEnd = null,
     Object? lutealPhaseLength = null,
   }) {
-    return _then(_value.copyWith(
-      startDate: null == startDate
-          ? _value.startDate
-          : startDate // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      cycleLength: null == cycleLength
-          ? _value.cycleLength
-          : cycleLength // ignore: cast_nullable_to_non_nullable
-              as int,
-      periodLength: null == periodLength
-          ? _value.periodLength
-          : periodLength // ignore: cast_nullable_to_non_nullable
-              as int,
-      ovulationDay: null == ovulationDay
-          ? _value.ovulationDay
-          : ovulationDay // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      fertileWindowStart: null == fertileWindowStart
-          ? _value.fertileWindowStart
-          : fertileWindowStart // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      fertileWindowEnd: null == fertileWindowEnd
-          ? _value.fertileWindowEnd
-          : fertileWindowEnd // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      lutealPhaseLength: null == lutealPhaseLength
-          ? _value.lutealPhaseLength
-          : lutealPhaseLength // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            startDate: null == startDate
+                ? _value.startDate
+                : startDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
+            cycleLength: null == cycleLength
+                ? _value.cycleLength
+                : cycleLength // ignore: cast_nullable_to_non_nullable
+                      as int,
+            periodLength: null == periodLength
+                ? _value.periodLength
+                : periodLength // ignore: cast_nullable_to_non_nullable
+                      as int,
+            ovulationDay: null == ovulationDay
+                ? _value.ovulationDay
+                : ovulationDay // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
+            fertileWindowStart: null == fertileWindowStart
+                ? _value.fertileWindowStart
+                : fertileWindowStart // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
+            fertileWindowEnd: null == fertileWindowEnd
+                ? _value.fertileWindowEnd
+                : fertileWindowEnd // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
+            lutealPhaseLength: null == lutealPhaseLength
+                ? _value.lutealPhaseLength
+                : lutealPhaseLength // ignore: cast_nullable_to_non_nullable
+                      as int,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -103,18 +109,20 @@ class _$CycleEntityCopyWithImpl<$Res, $Val extends CycleEntity>
 abstract class _$$CycleEntityImplCopyWith<$Res>
     implements $CycleEntityCopyWith<$Res> {
   factory _$$CycleEntityImplCopyWith(
-          _$CycleEntityImpl value, $Res Function(_$CycleEntityImpl) then) =
-      __$$CycleEntityImplCopyWithImpl<$Res>;
+    _$CycleEntityImpl value,
+    $Res Function(_$CycleEntityImpl) then,
+  ) = __$$CycleEntityImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {DateTime startDate,
-      int cycleLength,
-      int periodLength,
-      DateTime ovulationDay,
-      DateTime fertileWindowStart,
-      DateTime fertileWindowEnd,
-      int lutealPhaseLength});
+  $Res call({
+    DateTime startDate,
+    int cycleLength,
+    int periodLength,
+    DateTime ovulationDay,
+    DateTime fertileWindowStart,
+    DateTime fertileWindowEnd,
+    int lutealPhaseLength,
+  });
 }
 
 /// @nodoc
@@ -122,8 +130,9 @@ class __$$CycleEntityImplCopyWithImpl<$Res>
     extends _$CycleEntityCopyWithImpl<$Res, _$CycleEntityImpl>
     implements _$$CycleEntityImplCopyWith<$Res> {
   __$$CycleEntityImplCopyWithImpl(
-      _$CycleEntityImpl _value, $Res Function(_$CycleEntityImpl) _then)
-      : super(_value, _then);
+    _$CycleEntityImpl _value,
+    $Res Function(_$CycleEntityImpl) _then,
+  ) : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -136,50 +145,53 @@ class __$$CycleEntityImplCopyWithImpl<$Res>
     Object? fertileWindowEnd = null,
     Object? lutealPhaseLength = null,
   }) {
-    return _then(_$CycleEntityImpl(
-      startDate: null == startDate
-          ? _value.startDate
-          : startDate // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      cycleLength: null == cycleLength
-          ? _value.cycleLength
-          : cycleLength // ignore: cast_nullable_to_non_nullable
-              as int,
-      periodLength: null == periodLength
-          ? _value.periodLength
-          : periodLength // ignore: cast_nullable_to_non_nullable
-              as int,
-      ovulationDay: null == ovulationDay
-          ? _value.ovulationDay
-          : ovulationDay // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      fertileWindowStart: null == fertileWindowStart
-          ? _value.fertileWindowStart
-          : fertileWindowStart // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      fertileWindowEnd: null == fertileWindowEnd
-          ? _value.fertileWindowEnd
-          : fertileWindowEnd // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      lutealPhaseLength: null == lutealPhaseLength
-          ? _value.lutealPhaseLength
-          : lutealPhaseLength // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
+    return _then(
+      _$CycleEntityImpl(
+        startDate: null == startDate
+            ? _value.startDate
+            : startDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
+        cycleLength: null == cycleLength
+            ? _value.cycleLength
+            : cycleLength // ignore: cast_nullable_to_non_nullable
+                  as int,
+        periodLength: null == periodLength
+            ? _value.periodLength
+            : periodLength // ignore: cast_nullable_to_non_nullable
+                  as int,
+        ovulationDay: null == ovulationDay
+            ? _value.ovulationDay
+            : ovulationDay // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
+        fertileWindowStart: null == fertileWindowStart
+            ? _value.fertileWindowStart
+            : fertileWindowStart // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
+        fertileWindowEnd: null == fertileWindowEnd
+            ? _value.fertileWindowEnd
+            : fertileWindowEnd // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
+        lutealPhaseLength: null == lutealPhaseLength
+            ? _value.lutealPhaseLength
+            : lutealPhaseLength // ignore: cast_nullable_to_non_nullable
+                  as int,
+      ),
+    );
   }
 }
 
 /// @nodoc
 
 class _$CycleEntityImpl implements _CycleEntity {
-  const _$CycleEntityImpl(
-      {required this.startDate,
-      required this.cycleLength,
-      required this.periodLength,
-      required this.ovulationDay,
-      required this.fertileWindowStart,
-      required this.fertileWindowEnd,
-      this.lutealPhaseLength = 14});
+  const _$CycleEntityImpl({
+    required this.startDate,
+    required this.cycleLength,
+    required this.periodLength,
+    required this.ovulationDay,
+    required this.fertileWindowStart,
+    required this.fertileWindowEnd,
+    this.lutealPhaseLength = 14,
+  });
 
   @override
   final DateTime startDate;
@@ -225,14 +237,15 @@ class _$CycleEntityImpl implements _CycleEntity {
 
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      startDate,
-      cycleLength,
-      periodLength,
-      ovulationDay,
-      fertileWindowStart,
-      fertileWindowEnd,
-      lutealPhaseLength);
+    runtimeType,
+    startDate,
+    cycleLength,
+    periodLength,
+    ovulationDay,
+    fertileWindowStart,
+    fertileWindowEnd,
+    lutealPhaseLength,
+  );
 
   @JsonKey(ignore: true)
   @override
@@ -242,14 +255,15 @@ class _$CycleEntityImpl implements _CycleEntity {
 }
 
 abstract class _CycleEntity implements CycleEntity {
-  const factory _CycleEntity(
-      {required final DateTime startDate,
-      required final int cycleLength,
-      required final int periodLength,
-      required final DateTime ovulationDay,
-      required final DateTime fertileWindowStart,
-      required final DateTime fertileWindowEnd,
-      final int lutealPhaseLength}) = _$CycleEntityImpl;
+  const factory _CycleEntity({
+    required final DateTime startDate,
+    required final int cycleLength,
+    required final int periodLength,
+    required final DateTime ovulationDay,
+    required final DateTime fertileWindowStart,
+    required final DateTime fertileWindowEnd,
+    final int lutealPhaseLength,
+  }) = _$CycleEntityImpl;
 
   @override
   DateTime get startDate;

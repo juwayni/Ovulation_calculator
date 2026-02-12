@@ -3,14 +3,17 @@ import '../../core/constants/app_constants.dart';
 import 'app_button.dart';
 
 class MedicalDisclaimerModal extends StatelessWidget {
-  const MedicalDisclaimerModal({super.key});
+  final VoidCallback onAccept;
+  const MedicalDisclaimerModal({super.key, required this.onAccept});
 
-  static void show(BuildContext context) {
+  static void show(BuildContext context, {required VoidCallback onAccept}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      isDismissible: false,
+      enableDrag: false,
       backgroundColor: Colors.transparent,
-      builder: (context) => const MedicalDisclaimerModal(),
+      builder: (context) => MedicalDisclaimerModal(onAccept: onAccept),
     );
   }
 
@@ -49,7 +52,10 @@ class MedicalDisclaimerModal extends StatelessWidget {
           const SizedBox(height: 32),
           AppButton(
             text: 'I Understand',
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              onAccept();
+              Navigator.pop(context);
+            },
           ),
           const SizedBox(height: 16),
         ],

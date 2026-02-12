@@ -23,21 +23,16 @@ class CycleRingPainter extends CustomPainter {
     required this.periodColor,
     required this.fertileColor,
     required this.pmsColor,
-    this.defaultColor = const Color(0xFFF0F0F0),
+    this.defaultColor = const Color(0xFFD3D3D3), // Light grey for inactive
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = min(size.width, size.height) / 2;
-    const strokeWidth = 25.0;
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.round;
+    final radius = min(size.width, size.height) / 2 - 10;
 
-    final double sweepAngle = (2 * pi) / totalDays;
-    const double gap = 0.05;
+    final double angleStep = (2 * pi) / totalDays;
+    const double dotRadius = 6.0;
 
     for (int i = 0; i < totalDays; i++) {
       final day = i + 1;
@@ -51,54 +46,46 @@ class CycleRingPainter extends CustomPainter {
         color = pmsColor;
       }
 
-      paint.color = color;
-
-      // If it's the current day, we might want to highlight it or draw it differently
-      // But for the ring segments, we just draw them.
-
-      final startAngle = -pi / 2 + (i * sweepAngle) + gap;
-      final drawAngle = sweepAngle - (2 * gap);
-
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius - strokeWidth / 2),
-        startAngle,
-        drawAngle,
-        false,
-        paint,
+      final angle = -pi / 2 + (i * angleStep);
+      final dotCenter = Offset(
+        center.dx + radius * cos(angle),
+        center.dy + radius * sin(angle),
       );
-    }
 
-    // Draw indicator for current day
-    final indicatorPaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
+      // Current day highlight
+      if (day == currentDay) {
+        final outerPaint = Paint()
+          ..color = color.withOpacity(0.3)
+          ..style = PaintingStyle.fill;
+        canvas.drawCircle(dotCenter, dotRadius + 6, outerPaint);
 
-    final shadowPaint = Paint()
-      ..color = Colors.black.withOpacity(0.2)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+        final borderPaint = Paint()
+          ..color = color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2;
+        canvas.drawCircle(dotCenter, dotRadius + 6, borderPaint);
+      }
 
-    final indicatorAngle = -pi / 2 + ((currentDay - 1) * sweepAngle) + sweepAngle / 2;
-    final indicatorX = center.dx + (radius - strokeWidth / 2) * cos(indicatorAngle);
-    final indicatorY = center.dy + (radius - strokeWidth / 2) * sin(indicatorAngle);
+      final paint = Paint()
+        ..color = color
+        ..style = PaintingStyle.fill;
 
-    canvas.drawCircle(Offset(indicatorX, indicatorY), strokeWidth / 2 + 2, shadowPaint);
-    canvas.drawCircle(Offset(indicatorX, indicatorY), strokeWidth / 2 - 2, indicatorPaint);
+      canvas.drawCircle(dotCenter, dotRadius, paint);
 
-    // Draw dot for ovulation
-    if (ovulationDay != null) {
-        final ovAngle = -pi / 2 + ((ovulationDay! - 1) * sweepAngle) + sweepAngle / 2;
-        final ovX = center.dx + (radius - strokeWidth / 2) * cos(ovAngle);
-        final ovY = center.dy + (radius - strokeWidth / 2) * sin(ovAngle);
-
-        final ovPaint = Paint()..color = Colors.white..style = PaintingStyle.fill;
-        canvas.drawCircle(Offset(ovX, ovY), 4, ovPaint);
+      // If it's the ovulation day, add a white dot inside
+      if (day == ovulationDay) {
+        final whitePaint = Paint()
+          ..color = Colors.white
+          ..style = PaintingStyle.fill;
+        canvas.drawCircle(dotCenter, 2, whitePaint);
+      }
     }
   }
 
   @override
   bool shouldRepaint(covariant CycleRingPainter oldDelegate) {
     return oldDelegate.currentDay != currentDay ||
-           oldDelegate.totalDays != totalDays ||
-           oldDelegate.ovulationDay != ovulationDay;
+        oldDelegate.totalDays != totalDays ||
+        oldDelegate.ovulationDay != ovulationDay;
   }
 }

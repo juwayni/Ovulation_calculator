@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:uuid/uuid.dart';
 import '../../../core/constants/app_constants.dart';
-import '../../widgets/app_card.dart';
 import '../../widgets/date_selector.dart';
 import '../../providers/cycle_provider.dart';
 import '../../providers/period_provider.dart';
+import '../../providers/user_provider.dart';
 import '../../../data/models/period_model.dart';
-import 'package:uuid/uuid.dart';
+import '../../../domain/entities/cycle_entity.dart';
+import '../../widgets/medical_disclaimer_modal.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -22,86 +25,72 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showDisclaimer();
+      _checkOnboardingAndDisclaimer();
     });
   }
 
+  void _checkOnboardingAndDisclaimer() async {
+    final userAsync = ref.read(userProvider);
+    final user = userAsync.value;
+
+    if (user == null || !user.onboardingCompleted) {
+      context.go('/onboarding');
+      return;
+    }
+
+    if (!user.medicalDisclaimerAccepted) {
+      _showDisclaimer();
+    }
+  }
+
   void _showDisclaimer() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2))),
-            const SizedBox(height: 24),
-            const Icon(Icons.info_outline, color: Colors.blue, size: 48),
-            const SizedBox(height: 16),
-            const Text('Medical Disclaimer', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            const Text(
-              'This app provides estimates and is not a medical diagnostic tool.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                child: const Text('I Understand'),
-              ),
-            ),
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
+    MedicalDisclaimerModal.show(
+      context,
+      onAccept: () async {
+        final user = ref.read(userProvider).value;
+        if (user != null) {
+          await ref
+              .read(userActionProvider.notifier)
+              .updateUser(user.copyWith(medicalDisclaimerAccepted: true));
+        }
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final cycleAsync = ref.watch(currentCycleProvider);
+    final userAsync = ref.watch(userProvider);
+    final userName = userAsync.value?.name ?? 'Friend';
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppConstants.paddingMedium),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppConstants.paddingMedium,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(),
-              const SizedBox(height: 20),
-              _buildSearchBar(),
-              const SizedBox(height: 20),
+              _buildTopBar(),
+              const SizedBox(height: 24),
+              _buildGreeting(userName),
+              const SizedBox(height: 32),
               DateSelector(
                 selectedDate: selectedDate,
                 onDateSelected: (date) => setState(() => selectedDate = date),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               cycleAsync.when(
                 data: (cycle) => _buildCurrentStatus(cycle),
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (e, _) => Text('Error: $e'),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               _buildSectionHeader('Daily Insight'),
               const SizedBox(height: 12),
               _buildInsightCards(),
+              const SizedBox(height: 40),
             ],
           ),
         ),
@@ -109,179 +98,233 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Hi, Jessica',
-              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                  ),
-            ),
-            const Text('How are you feeling today?'),
-          ],
-        ),
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.blue.shade50,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.wb_sunny, color: Colors.orange.shade400, size: 20),
-              const SizedBox(width: 4),
-              const Text('24°C', style: TextStyle(fontWeight: FontWeight.bold)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSearchBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: const TextField(
-        decoration: InputDecoration(
-          icon: Icon(Icons.search, color: Colors.grey),
-          hintText: 'Search for symptoms, tips...',
-          border: InputBorder.none,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCurrentStatus(dynamic cycle) {
-    // Check if selected date is in period
-    bool isPeriodDay = selectedDate.isAfter(cycle.startDate.subtract(Duration(days: cycle.cycleLength))) &&
-                       selectedDate.isBefore(cycle.startDate.subtract(Duration(days: cycle.cycleLength - cycle.periodLength)));
-
-    String status = isPeriodDay ? 'Period Day' : 'Next Period in';
-    String value = isPeriodDay ? '3' : '${cycle.startDate.difference(selectedDate).inDays} days';
-
-    return AppCard(
-      color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
+  Widget _buildTopBar() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '$status $value',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-                Text(cycle.cycleLength > 25 ? 'Your cycle is regular.' : 'Cycle slightly irregular.'),
-                const SizedBox(height: 12),
-                ElevatedButton(
-                  onPressed: () => _addMockPeriod(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  child: const Text('Edit Period'),
-                ),
-              ],
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              shape: BoxShape.circle,
+            ),
+            child: const Center(
+              child: Icon(Icons.person, size: 20, color: Colors.white),
             ),
           ),
-          const Icon(Icons.water_drop, size: 80, color: Colors.pink),
+          Stack(
+            children: [
+              const Icon(Icons.notifications_none_outlined, size: 28),
+              Positioned(
+                right: 2,
+                top: 2,
+                child: Container(
+                  width: 10,
+                  height: 10,
+                  decoration: const BoxDecoration(
+                    color: Colors.pink,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  void _addMockPeriod() {
-    final period = PeriodModel(
-      id: const Uuid().v4(),
-      startDate: DateTime.now().subtract(const Duration(days: 28)),
-      endDate: DateTime.now().subtract(const Duration(days: 23)),
+  Widget _buildGreeting(String name) {
+    return Text(
+      'Hi, $name',
+      style: Theme.of(context).textTheme.displaySmall?.copyWith(
+        fontWeight: FontWeight.bold,
+        fontSize: 28,
+        letterSpacing: -0.5,
+      ),
     );
-    ref.read(periodActionProvider.notifier).addPeriod(period);
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mock period added!')));
+  }
+
+  Widget _buildCurrentStatus(CycleEntity cycle) {
+    int dayOfCycle = selectedDate.difference(cycle.startDate).inDays + 1;
+    bool isPeriod = dayOfCycle > 0 && dayOfCycle <= cycle.periodLength;
+
+    return Center(
+      child: Column(
+        children: [
+          Text(
+            isPeriod ? 'Period:' : 'Cycle:',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Day $dayOfCycle',
+            style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () => _logNewPeriod(cycle),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.pink,
+              foregroundColor: Colors.white,
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              elevation: 0,
+            ),
+            child: const Text(
+              'Log New Period',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextButton(
+            onPressed: () => _editPeriodDate(cycle),
+            child: const Text(
+              'Edit Period Date',
+              style: TextStyle(color: Colors.pink, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _logNewPeriod(CycleEntity cycle) async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now().subtract(const Duration(days: 30)),
+      lastDate: DateTime.now(),
+    );
+    if (date != null) {
+      final period = PeriodModel(
+        id: const Uuid().v4(),
+        startDate: date,
+        endDate: date.add(Duration(days: cycle.periodLength - 1)),
+      );
+      await ref.read(periodActionProvider.notifier).addPeriod(period);
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('New period logged!')));
+      }
+    }
+  }
+
+  void _editPeriodDate(CycleEntity cycle) async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: cycle.startDate,
+      firstDate: DateTime.now().subtract(const Duration(days: 60)),
+      lastDate: DateTime.now().add(const Duration(days: 30)),
+    );
+    if (date != null) {
+      final period = PeriodModel(
+        id: const Uuid().v4(),
+        startDate: date,
+        endDate: date.add(Duration(days: cycle.periodLength - 1)),
+      );
+      await ref.read(periodActionProvider.notifier).addPeriod(period);
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Period updated!')));
+      }
+    }
   }
 
   Widget _buildSectionHeader(String title) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        TextButton(onPressed: () {}, child: const Text('See All')),
-      ],
+    return Text(
+      title,
+      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
     );
   }
 
   Widget _buildInsightCards() {
-    return SizedBox(
+    return Container(
       height: 160,
+      margin: const EdgeInsets.only(top: 10),
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
           _buildInsightCard(
-            'Hydration Tip',
-            'Drink at least 8 glasses of water today.',
-            Icons.water_drop,
-            Colors.blue.shade100,
+            'Log Your\nSymptoms',
+            Icons.add,
+            Colors.pink,
+            Colors.white,
+            true,
+            onTap: () => context.push('/log-symptoms'),
           ),
           _buildInsightCard(
-            'Exercise',
-            'Light yoga can help with cramps.',
-            Icons.self_improvement,
-            Colors.green.shade100,
+            'Symptoms to\nExpect',
+            Icons.favorite,
+            Colors.pink,
+            const Color(0xFFFDE1E3),
+            false,
+          ),
+          _buildInsightCard(
+            'Log Your\nBBT',
+            Icons.thermostat,
+            Colors.pink,
+            const Color(0xFFFFF1F2),
+            false,
+            onTap: () => context.push('/log-temperature'),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildInsightCard(String title, String desc, IconData icon, Color color) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 800),
-      builder: (context, value, child) {
-        return Opacity(
-          opacity: value,
-          child: Transform.scale(
-            scale: 0.8 + (0.2 * value),
-            child: child,
-          ),
-        );
-      },
+  Widget _buildInsightCard(
+    String title,
+    IconData icon,
+    Color iconColor,
+    Color bgColor,
+    bool outlinedIcon, {
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
       child: Container(
-        width: 200,
+        width: 140,
         margin: const EdgeInsets.only(right: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(20),
+          color: bgColor,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: bgColor == Colors.white
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.02),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(icon, size: 30),
-            const SizedBox(height: 12),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            Text(desc, style: const TextStyle(fontSize: 12)),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: outlinedIcon ? Colors.pink.shade50 : Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: iconColor, size: 24),
+            ),
+            Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                height: 1.2,
+              ),
+            ),
           ],
         ),
       ),
